@@ -7,6 +7,7 @@ library(shinydashboard)
 library(leaflet)
 library(RColorBrewer)
 library(raster)
+#library(sf)
 #library(dplyr)
 
 #Define the header, sidebar, and body for the application
@@ -37,18 +38,19 @@ body<-dashboardBody(
           
           box(
             title = "Santa Rosa",width=NULL, solidHeader = TRUE,status="primary",
-            sliderInput("slider", "Number of observations:", 1, 100, 50)
-          )
+            sliderInput("slider", "Number of observations:", 1, 100, 50))
+          
+          # ,box(width = NULL, leafletOutput("islandmap"))
         )
     ),
     
     # Third tab content
     tabItem(tabName = "sdm",
-        h2("Species Distribution Models"),
-        fluidRow(
-          box(width=NULL, solidHeader = TRUE),
-          leafletOutput("sdmmap", height=500)
-        )#fluidrow
+        h2("Species Distribution Models")
+        # ,fluidRow(
+        #   box(width=NULL, solidHeader = TRUE),
+        #   leafletOutput("sdmmap", height=500)
+        # )#fluidrow
     )
     
   )
@@ -69,18 +71,22 @@ server <- function(input, output) {
     hist(data)
   })
   
+  # island_maps<-read_sf(dsn="Oakology/data/islands/scr/extent.shp")
+  # output$islandmap<-renderPlot({
+  #   island_maps
+  # })
   
-  ras<-raster("data/sdm/scr/nofog/historic.tif")
-  pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(map),
-                      na.color = "transparent")
-  
-  
-  output$sdmmap<-renderLeaflet({
-    leaflet() %>%
-      addTiles() %>% 
-      addRasterImage(ras, colors = pal, opacity = 0.8)
-
-  }) #end leaflet
+  # ras<-raster("data/sdm/scr/nofog/historic.tif")
+  # pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(map),
+  #                     na.color = "transparent")
+  # 
+  # 
+  # output$sdmmap<-renderLeaflet({
+  #   leaflet() %>%
+  #     addTiles() %>% 
+  #     addRasterImage(ras, colors = pal, opacity = 0.8)
+  # 
+  # }) #end leaflet
 }#end server
 
 shinyApp(ui, server)
