@@ -4,6 +4,7 @@
 
 # load the shiny package
 library(shiny)
+library(shinythemes)
 
 ras<-raster("data/sdm/scr/nofog/historic.tif")
 
