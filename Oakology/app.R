@@ -11,15 +11,17 @@ library(tidyverse)
 library(sf)
 library(RColorBrewer)
 
-ras<-raster("Oakology/data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
-# proj4string(ras) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs") 
-# 
-# pal <- colorNumeric(palette = "Spectral", values(ras), na.color = "transparent", reverse=TRUE)
-# 
-# leaflet() %>% addTiles() %>%
-#   addRasterImage(ras, colors = pal, opacity = 0.8) %>%
-#   addLegend("topright", pal = pal, values = values(ras),
-#             title = "SDM", labFormat = labelFormat(transform=function(ras) sort (ras, decreasing=TRUE)))
+setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
+csv<-read_csv("data/historicsummarytable.csv")
+ras<-raster("data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
+proj4string(ras) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+
+pal <- colorNumeric(palette = "Spectral", values(ras), na.color = "transparent", reverse=TRUE)
+
+leaflet() %>% addTiles() %>%
+  addRasterImage(ras, colors = pal, opacity = 0.8) %>%
+  addLegend("topright", pal = pal, values = values(ras),
+            title = "SDM", labFormat = labelFormat(transform=function(ras) sort (ras, decreasing=TRUE)))
 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
@@ -55,15 +57,23 @@ ui<-fluidPage(theme = shinytheme("readable"),
                        )
               ),
               tabPanel("Islands", "This panel is intentionally left blank"),
-              tabPanel("SDM", "This panel is intentionally left blank",
-                       leafletOutput("sdm"),
+              tabPanel("SDM",
+                       leafletOutput("sdm")
                        )
               )
 )
 
 # Define server logic ----
 server <- function(input, output) {
-  
+ 
+   output$sdm <- renderLeaflet({
+     leaflet() %>% addTiles() %>%
+       addRasterImage(ras, colors = pal, opacity = 0.8) %>%
+       addLegend("topright", pal = pal, values = values(ras),
+                 title = "SDM", labFormat = labelFormat(transform=function(ras) sort (ras, decreasing=TRUE)))
+     
+  })
+   
 }
 
 # Run the app ----
