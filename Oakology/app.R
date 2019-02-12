@@ -12,16 +12,6 @@ library(sf)
 library(RColorBrewer)
 
 setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
-csv<-read_csv("data/historicsummarytable.csv")
-ras<-raster("data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
-proj4string(ras) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-
-pal <- colorNumeric(palette = "Spectral", values(ras), na.color = "transparent", reverse=TRUE)
-
-leaflet() %>% addTiles() %>%
-  addRasterImage(ras, colors = pal, opacity = 0.8) %>%
-  addLegend("topright", pal = pal, values = values(ras),
-            title = "SDM", labFormat = labelFormat(transform=function(ras) sort (ras, decreasing=TRUE)))
 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
@@ -58,21 +48,44 @@ ui<-fluidPage(theme = shinytheme("readable"),
               ),
               tabPanel("Islands", "This panel is intentionally left blank"),
               tabPanel("SDM",
-                       leafletOutput("sdm")
+                       leafletOutput("SCR"),
+                       leafletOutput("SRI")
                        )
               )
 )
 
 # Define server logic ----
 server <- function(input, output) {
- 
-   output$sdm <- renderLeaflet({
+
+  #Can if else statement through which rasters to load based on input
+  scr<-raster("data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
+  proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+  
+  sri<-raster("data/sdm/sri/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
+  proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+  
+  palscr <- colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE)
+  palsri <- colorNumeric(palette = "Spectral", values(sri), na.color = "transparent", reverse=TRUE)
+  
+   output$SCR <- renderLeaflet({
      leaflet() %>% addTiles() %>%
-       addRasterImage(ras, colors = pal, opacity = 0.8) %>%
-       addLegend("topright", pal = pal, values = values(ras),
-                 title = "SDM", labFormat = labelFormat(transform=function(ras) sort (ras, decreasing=TRUE)))
-     
-  })
+       addRasterImage(scr, colors = palscr, opacity = 0.8) %>%
+       #addRasterImage(sri, colors = palsri, opacity = 0.8) %>% 
+       addLegend("topright", pal = palscr, values = values(scr),
+                 title = "SDM", labFormat = labelFormat(transform=function(scr) sort (scr, decreasing=TRUE)))
+   })
+   
+   output$SRI<- renderLeaflet({
+     leaflet() %>% addTiles() %>%
+       addRasterImage(sri, colors = palsri, opacity = 0.8) %>%
+       addLegend("topright", pal = palsri, values = values(sri),
+                 title = "SDM", labFormat = labelFormat(transform=function(sri) sort (sri, decreasing=TRUE)))
+
+#Need to create a zoomout maximum (only to extent of island, but that they are allowed to zoom in)
+   })
+   #But can have both image in one map
+   #And then give summary statistics table below that reacts based on map selected!
+ 
    
 }
 
