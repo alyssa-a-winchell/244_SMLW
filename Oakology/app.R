@@ -76,10 +76,14 @@ server <- function(input, output) {
   palsri <- colorNumeric(palette = "Spectral", values(sri), na.color = "transparent", reverse=TRUE)
   
    output$SCR <- renderLeaflet({
+     sdmcol <- switch(input$sdmcolor,
+                      "Spectral" = colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE),
+                      "RdYlGn" = colorNumeric(palette = "RdYlGn", values(scr), na.color = "transparent", reverse=TRUE))
+     
      leaflet() %>% addTiles() %>%
-       addRasterImage(scr, colors = palscr, opacity = 0.8) %>%
-       addRasterImage(sri, colors = palsri, opacity = 0.8) %>% 
-       addLegend("topright", pal = palscr, values = values(scr),
+       addRasterImage(scr, colors = sdmcol, opacity = 0.8) %>%
+       addRasterImage(sri, colors = sdmcol, opacity = 0.8) %>% 
+       addLegend("topright", pal = sdmcol, values = values(scr),
                  title = "SDM", labFormat = labelFormat(transform=function(scr) sort (scr, decreasing=TRUE)))
    })
    
