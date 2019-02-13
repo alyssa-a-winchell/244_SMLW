@@ -1,6 +1,10 @@
 #Oakology Shiny App
 # Find out more about building applications with Shiny here: http://shiny.rstudio.com/
 
+#Notes
+#Function for select box is selectInput.
+#For slider it's sliderInput
+
 
 # load the shiny package
 library(shiny)
@@ -48,8 +52,12 @@ ui<-fluidPage(theme = shinytheme("readable"),
               ),
               tabPanel("Islands", "This panel is intentionally left blank"),
               tabPanel("SDM",
-                       leafletOutput("SCR"),
-                       leafletOutput("SRI")
+                       mainPanel(
+                         selectInput("sdmcolor", "Choose a Color Palette", c("Spectral", "RdYlGn")),
+                         leafletOutput("SCR"),
+                                 leafletOutput("SRI")
+                                 )
+                       
                        )
               )
 )
@@ -70,7 +78,7 @@ server <- function(input, output) {
    output$SCR <- renderLeaflet({
      leaflet() %>% addTiles() %>%
        addRasterImage(scr, colors = palscr, opacity = 0.8) %>%
-       #addRasterImage(sri, colors = palsri, opacity = 0.8) %>% 
+       addRasterImage(sri, colors = palsri, opacity = 0.8) %>% 
        addLegend("topright", pal = palscr, values = values(scr),
                  title = "SDM", labFormat = labelFormat(transform=function(scr) sort (scr, decreasing=TRUE)))
    })
