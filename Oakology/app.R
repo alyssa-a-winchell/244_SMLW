@@ -53,7 +53,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("Islands", "This panel is intentionally left blank"),
               tabPanel("SDM",
                        mainPanel(
-                         selectInput("sdmcolor", "Choose a Color Palette", c("Spectral", "RdYlGn")),
+                         selectInput("sdmcolor", "Choose a Color Palette", c("Spectral", "Viridis")),
                          leafletOutput("SCR"),
                                  leafletOutput("SRI")
                                  )
@@ -68,21 +68,24 @@ server <- function(input, output) {
   #Can if else statement through which rasters to load based on input
   scr<-raster("data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
   proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+  scr<-projectRaster(scr,crs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs")
   
   sri<-raster("data/sdm/sri/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
   proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+  sri<-projectRaster(sri,crs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs")
   
-  palscr <- colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE)
+  
+  #palscr <- colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE)
   palsri <- colorNumeric(palette = "Spectral", values(sri), na.color = "transparent", reverse=TRUE)
   
    output$SCR <- renderLeaflet({
      sdmcol <- switch(input$sdmcolor,
-                      "Spectral" = colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE),
-                      "RdYlGn" = colorNumeric(palette = "RdYlGn", values(scr), na.color = "transparent", reverse=TRUE))
+                      "Spectral" = colorNumeric(palette = "Spectral", domain=values(scr), na.color = "transparent", reverse=TRUE),
+                      "Viridis" = colorNumeric(palette = "viridis", domain=values(scr), na.color = "transparent", reverse=TRUE))
      
      leaflet() %>% addTiles() %>%
-       addRasterImage(scr, colors = sdmcol, opacity = 0.8) %>%
-       addRasterImage(sri, colors = sdmcol, opacity = 0.8) %>% 
+       addRasterImage(scr, colors = sdmcol, opacity = 0.8, project=FALSE) %>%
+       addRasterImage(sri, colors = sdmcol, opacity = 0.8, project=FALSE) %>% 
        addLegend("topright", pal = sdmcol, values = values(scr),
                  title = "SDM", labFormat = labelFormat(transform=function(scr) sort (scr, decreasing=TRUE)))
    })
