@@ -53,9 +53,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("Islands", "This panel is intentionally left blank"),
               tabPanel("SDM",
                        mainPanel(
-                         selectInput("sdmcolor", "Choose a Color Palette", c("Spectral", "Viridis")),
-                         leafletOutput("SCR"),
-                                 leafletOutput("SRI")
+                         selectInput("sdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
+                         selectInput("scenario", "Choose a Scenario", c("nofog", "fogconstant", "foginc", "fogdec", "fogelev")),
+                         leafletOutput("sdmmap", width=1000, height=500)
                                  )
                        
                        )
@@ -65,42 +65,44 @@ ui<-fluidPage(theme = shinytheme("readable"),
 # Define server logic ----
 server <- function(input, output) {
 
-  #Can if else statement through which rasters to load based on input
-  scr<-raster("data/sdm/scr/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
-  proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-  scr<-projectRaster(scr,crs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs")
+  #current wd is "G:/data/GitHub/244_SMLW" for all files
+
+  #Possible but not working yet
+  # scen <- reactive({switch(input$scenario,
+  #                  "fogconstant" = "fogconstant",
+  #                  "nofog"="nofog")
+  # })
   
-  sri<-raster("data/sdm/sri/nofog/historic.tif") #current wd is "G:/data/GitHub/244_SMLW"
-  proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-  sri<-projectRaster(sri,crs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs")
+  #Tried a million different things for reactive variable outputs and then erased them all because all failures
   
-  
-  #palscr <- colorNumeric(palette = "Spectral", values(scr), na.color = "transparent", reverse=TRUE)
-  palsri <- colorNumeric(palette = "Spectral", values(sri), na.color = "transparent", reverse=TRUE)
-  
-   output$SCR <- renderLeaflet({
+     output$sdmmap <- renderLeaflet({
+       
+       #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
+       scr<-raster(paste0("data/sdm/scr/",input$scenario,"/historic.tif")) 
+       proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       
+       #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
+       scr<-raster(paste0("data/sdm/scr/",input$scenario,"/historic.tif")) 
+       proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       
+       merged<-merge(scr, sri)
+       
      sdmcol <- switch(input$sdmcolor,
-                      "Spectral" = colorNumeric(palette = "Spectral", domain=values(scr), na.color = "transparent", reverse=TRUE),
-                      "Viridis" = colorNumeric(palette = "viridis", domain=values(scr), na.color = "transparent", reverse=TRUE))
+                      "Spectral" = colorNumeric(palette = "Spectral", domain=values(merged), na.color = "transparent", reverse=TRUE),
+                      "Spectral2" = colorNumeric(palette = "Spectral", domain=values(merged), na.color = "transparent", reverse=FALSE),
+                      "Viridis" = colorNumeric(palette = "viridis", domain=values(merged), na.color = "transparent", reverse=TRUE),
+                      "Magma" = colorNumeric(palette = "magma", domain=values(merged), na.color = "transparent", reverse=TRUE))
      
      leaflet() %>% addTiles() %>%
-       addRasterImage(scr, colors = sdmcol, opacity = 0.8, project=FALSE) %>%
-       addRasterImage(sri, colors = sdmcol, opacity = 0.8, project=FALSE) %>% 
-       addLegend("topright", pal = sdmcol, values = values(scr),
-                 title = "SDM", labFormat = labelFormat(transform=function(scr) sort (scr, decreasing=TRUE)))
+       addRasterImage(merged, colors = sdmcol, opacity = 0.8, project=FALSE) %>%
+       #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
+       addLegend("topright", pal = sdmcol, values = values(merged),
+                 title = "Suitability", 
+                 labFormat = labelFormat(transform=function(merged) sort (merged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
+     
    })
    
-   output$SRI<- renderLeaflet({
-     leaflet() %>% addTiles() %>%
-       addRasterImage(sri, colors = palsri, opacity = 0.8) %>%
-       addLegend("topright", pal = palsri, values = values(sri),
-                 title = "SDM", labFormat = labelFormat(transform=function(sri) sort (sri, decreasing=TRUE)))
-
-#Need to create a zoomout maximum (only to extent of island, but that they are allowed to zoom in)
-   })
-   #But can have both image in one map
-   #And then give summary statistics table below that reacts based on map selected!
- 
+ #Issue is that we need values from both scr and sri
    
 }
 
