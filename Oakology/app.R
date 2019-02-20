@@ -75,6 +75,10 @@ server <- function(input, output) {
   
   #Tried a million different things for reactive variable outputs and then erased them all because all failures
   
+  # scen<-reactive({
+  #   scenariofile<-input$scenario
+  # })
+  # 
      output$sdmmap <- renderLeaflet({
        
        #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
