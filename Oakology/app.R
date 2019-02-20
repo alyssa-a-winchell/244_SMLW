@@ -54,7 +54,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("SDM",
                        mainPanel(
                          selectInput("sdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
-                         selectInput("scenario", "Choose a Scenario", c("nofog", "fogconstant", "foginc", "fogdec", "fogelev")),
+                         selectInput("scenario", "Choose a Scenario", c("No Fog","Constant Fog", "Fog Increase", "Fog Decrease", "Fog Elevation Threshold")),
+                         selectInput("projection", "Choose a Projection", c("Hot-Wet","Warm-Wet", "Warm-Dry", "Hot-Dry")), #figure out how to make historic conditional for time period
+                         selectInput("timeperiod", "Choose a Time Period", c("2010-2039","2040-2069", "2070-2099")),
                          leafletOutput("sdmmap", width=1000, height=500)
                                  )
                        
@@ -81,12 +83,29 @@ server <- function(input, output) {
   # 
      output$sdmmap <- renderLeaflet({
        
+       
+    scen<-switch(input$scenario,
+                 "No Fog"=scen<-"nofog",
+                 "Constant Fog"=scen<-"fogconstant", 
+                 "Fog Increase"=scen<-"foginc", 
+                 "Fog Decrease"=scen<-"fogdec", 
+                 "Fog Elevation Threshold"=scen<-"fogelev")
+    proj<-switch(input$projection,
+                 "Hot-Wet"=proj<-"CCSM4_rcp85",
+                 "Warm-Wet"=proj<-"MPI_rcp45", 
+                 "Warm-Dry"=proj<-"MIROC_rcp45", 
+                 "Hot-Dry"=proj<-"MIROC_rcp85") #Need to include historic
+    time<-switch(input$timeperiod,
+                 "2010-2039"=time<-"_2010_2039",
+                 "2040-2069"=time<-"_2040_2069", 
+                 "2070-2099"=time<-"_2070_2099") #Need to include historic, if historic then no time period and time default defined as ""
+    
        #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
-       scr<-raster(paste0("data/sdm/scr/",input$scenario,"/historic.tif")) 
+       scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
        proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
        #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
-       scr<-raster(paste0("data/sdm/scr/",input$scenario,"/historic.tif")) 
+       scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
        proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
        merged<-merge(scr, sri)
