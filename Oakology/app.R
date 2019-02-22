@@ -15,7 +15,7 @@ library(tidyverse)
 library(sf)
 library(RColorBrewer)
 
-setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
+#setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
@@ -104,8 +104,8 @@ server <- function(input, output) {
        scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
        proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
-       #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
-       scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
+       #sri<-raster(paste0("data/sdm/sri/nofog/historic.tif")) 
+       sri<-raster(paste0("data/sdm/sri/",scen,"/", proj, time, ".tif")) 
        proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
        merged<-merge(scr, sri)
@@ -117,7 +117,7 @@ server <- function(input, output) {
                       "Magma" = colorNumeric(palette = "magma", domain=values(merged), na.color = "transparent", reverse=TRUE))
      
      leaflet() %>% addTiles() %>%
-       addRasterImage(merged, colors = sdmcol, opacity = 0.8, project=FALSE) %>%
+       addRasterImage(merged, colors = sdmcol, opacity = 0.8) %>%
        #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
        addLegend("topright", pal = sdmcol, values = values(merged),
                  title = "Suitability", 
