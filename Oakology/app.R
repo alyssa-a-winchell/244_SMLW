@@ -15,7 +15,7 @@ library(tidyverse)
 library(sf)
 library(RColorBrewer)
 
-#setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
+setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
@@ -50,7 +50,12 @@ ui<-fluidPage(theme = shinytheme("readable"),
                          )
                        )
               ),
-              tabPanel("Islands", "This panel is intentionally left blank"),
+              tabPanel("Islands",
+                       mainPanel(
+                         selectInput("islandvar", "Choose an Island Variable", c("DEM", "Soil", "Vegetation")),
+                         leafletOutput("islandmap", width=1000, height=500)
+                       )
+                       ),
               tabPanel("SDM",
                        mainPanel(
                          selectInput("sdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
@@ -69,18 +74,7 @@ server <- function(input, output) {
 
   #current wd is "G:/data/GitHub/244_SMLW" for all files
 
-  #Possible but not working yet
-  # scen <- reactive({switch(input$scenario,
-  #                  "fogconstant" = "fogconstant",
-  #                  "nofog"="nofog")
-  # })
   
-  #Tried a million different things for reactive variable outputs and then erased them all because all failures
-  
-  # scen<-reactive({
-  #   scenariofile<-input$scenario
-  # })
-  # 
      output$sdmmap <- renderLeaflet({
        
        
@@ -100,11 +94,11 @@ server <- function(input, output) {
                  "2040-2069"=time<-"_2040_2069", 
                  "2070-2099"=time<-"_2070_2099") #Need to include historic, if historic then no time period and time default defined as ""
     
-       #scr<-raster(paste0("data/sdm/scr/nofog/historic.tif")) 
+     
        scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
        proj4string(scr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
-       #sri<-raster(paste0("data/sdm/sri/nofog/historic.tif")) 
+       
        sri<-raster(paste0("data/sdm/sri/",scen,"/", proj, time, ".tif")) 
        proj4string(sri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
@@ -123,104 +117,37 @@ server <- function(input, output) {
                  title = "Suitability", 
                  labFormat = labelFormat(transform=function(merged) sort (merged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
      
-   })
+   }) #end render leaflet
+     
+     output$islandmap <- renderLeaflet({
+       
+       scrdem<-raster("data/islands/scr/DEM.tif") 
+       proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       sridem<-raster("data/islands/sri/DEM.tif") 
+       proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
+       
+       scrveg<-read_sf("data/islands/scr/veg.shp")
+       sriveg<-read_sf("data/islands/sri/veg.shp")
+       mergedveg<-st_union(scrveg, sriveg)
+
+       scrsoils<-read_sf("data/islands/scr/soils.shp")
+       srisoils<-read_sf("data/islands/sri/soils.shp")
+       mergedsoils<-merge(scrsoils, srisoils)
+       
+       col <- colorNumeric(palette = "Spectral", domain=values(mergeddem), na.color = "transparent", reverse=TRUE)
+       
+       leaflet() %>% addTiles() %>%
+         addRasterImage(mergeddem, colors = col, opacity = 0.8)
+  
+        
+       
+     }) #end render leaflet
    
- #Issue is that we need values from both scr and sri
    
-}
+}#end server
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
 
 
-
-# 
-# ## Shiny App ##
-# library(shiny)
-# library(shinydashboard)
-# library(leaflet)
-# #library(RColorBrewer)
-# #library(raster)
-# #library(sf)
-# #library(dplyr)
-# 
-# #Define the header, sidebar, and body for the application
-# header<- dashboardHeader(title = "Oakology")
-# 
-# sidebar<-dashboardSidebar(
-#   sidebarMenu(
-#     menuItem("Summary", tabName = "summary",icon=icon("tree deciduous")),
-#     menuItem("Islands", tabName = "islands",icon=icon("globe")),
-#     menuItem("SDM", tabName = "sdm",icon=icon("leaf"))
-#   )
-# )
-# 
-# body<-dashboardBody(
-#   tabItems(
-#     # First tab content
-#     tabItem(tabName = "summary",
-#         h2("Oakology Group Project Summary")
-#     ),
-#     
-#     # Second tab content
-#     tabItem(tabName = "islands",
-#         h2("Island Environmental Layers"),
-#         fluidRow(
-#           box(
-#             title="Santa Cruz", width=NULL, solidHeader = TRUE,status="primary",
-#             plotOutput("plot1", height = 250)),
-#           
-#           box(
-#             title = "Santa Rosa",width=NULL, solidHeader = TRUE,status="primary",
-#             sliderInput("slider", "Number of observations:", 1, 100, 50))
-#           
-#           # ,box(width = NULL, leafletOutput("islandmap"))
-#         )
-#     ),
-#     
-#     # Third tab content
-#     tabItem(tabName = "sdm",
-#         h2("Species Distribution Models")
-#         # ,fluidRow(
-#         #   box(width=NULL, solidHeader = TRUE),
-#         #   leafletOutput("sdmmap", height=500)
-#         # )#fluidrow
-#     )
-#     
-#   )
-# )
-# 
-# ui<-dashboardPage(
-#   header,
-#   sidebar,
-#   body
-# )
-# 
-# server <- function(input, output) {
-#   set.seed(122)
-#   histdata <- rnorm(500)
-#   
-#   output$plot1 <- renderPlot({
-#     data <- histdata[seq_len(input$slider)]
-#     hist(data)
-#   })
-#   
-#   # island_maps<-read_sf(dsn="Oakology/data/islands/scr/extent.shp")
-#   # output$islandmap<-renderPlot({
-#   #   island_maps
-#   # })
-#   
-#   # ras<-raster("data/sdm/scr/nofog/historic.tif")
-#   # pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(map),
-#   #                     na.color = "transparent")
-#   # 
-#   # 
-#   # output$sdmmap<-renderLeaflet({
-#   #   leaflet() %>%
-#   #     addTiles() %>% 
-#   #     addRasterImage(ras, colors = pal, opacity = 0.8)
-#   # 
-#   # }) #end leaflet
-# }#end server
-# 
-# shinyApp(ui, server)
