@@ -52,7 +52,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
               ),
               tabPanel("Islands",
                        mainPanel(
-                         selectInput("islandvar", "Choose an Island Variable", c("DEM", "Soil", "Vegetation")),
+                         selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation")),
                          leafletOutput("islandmap", width=1000, height=500)
                        )
                        ),
@@ -127,18 +127,16 @@ server <- function(input, output) {
        proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
        
-       scrveg<-read_sf("data/islands/scr/veg.shp")
-       sriveg<-read_sf("data/islands/sri/veg.shp")
-       mergedveg<-st_union(scrveg, sriveg)
-
-       scrsoils<-read_sf("data/islands/scr/soils.shp")
-       srisoils<-read_sf("data/islands/sri/soils.shp")
-       mergedsoils<-merge(scrsoils, srisoils)
+       scrveg<-raster("data/islands/scr/veg.tif")
+       sriveg<-raster("data/islands/sri/veg.tif")
+       mergedveg<-raster::merge(scrveg, sriveg, tolerance = 0.5)
        
-       col <- colorNumeric(palette = "Spectral", domain=values(mergeddem), na.color = "transparent", reverse=TRUE)
+       
+       col <- colorNumeric(palette = "Spectral", domain=values(mergedveg), na.color = "transparent", reverse=TRUE)
        
        leaflet() %>% addTiles() %>%
-         addRasterImage(mergeddem, colors = col, opacity = 0.8)
+         addRasterImage(mergedveg, colors = col, opacity = 0.8)
+         
   
         
        
