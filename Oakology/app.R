@@ -14,6 +14,7 @@ library(leaflet)
 library(tidyverse)
 library(sf)
 library(RColorBrewer)
+library(shinyWidgets)
 
 setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
@@ -59,9 +60,19 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("SDM",
                        mainPanel(
                          selectInput("sdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
-                         selectInput("scenario", "Choose a Scenario", c("No Fog","Constant Fog", "Fog Increase", "Fog Decrease", "Fog Elevation Threshold")),
-                         selectInput("projection", "Choose a Projection", c("Hot-Wet","Warm-Wet", "Warm-Dry", "Hot-Dry")), #figure out how to make historic conditional for time period
-                         selectInput("timeperiod", "Choose a Time Period", c("2010-2039","2040-2069", "2070-2099")),
+                         selectInput("scenario", "Choose a Scenario", c("No Fog",
+                                                                        "Constant Fog",
+                                                                        "Fog Increase",
+                                                                        "Fog Decrease",
+                                                                        "Fog Elevation Threshold")),
+                         selectInput("projection", "Choose a Projection", c("Hot-Wet",
+                                                                            "Warm-Wet",
+                                                                            "Warm-Dry",
+                                                                            "Hot-Dry")), #figure out how to make historic conditional for time period
+                         #selectInput("timeperiod", "Choose a Time Period", c("2010-2039","2040-2069", "2070-2099")),
+                         sliderTextInput("timeperiod", "Choose a Time Period", choices = c("2010-2039", 
+                                                                                           "2040-2069", 
+                                                                                           "2070-2099"), animate=TRUE),
                          leafletOutput("sdmmap", width=1000, height=500)
                                  )
                        
