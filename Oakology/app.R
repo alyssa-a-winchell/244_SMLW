@@ -132,21 +132,37 @@ server <- function(input, output) {
      
      output$islandmap <- renderLeaflet({
        
-       scrdem<-raster("data/islands/scr/DEM.tif") 
-       proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       sridem<-raster("data/islands/sri/DEM.tif") 
-       proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
-       
+       # scrdem<-raster("data/islands/scr/DEM.tif") 
+       # proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       # sridem<-raster("data/islands/sri/DEM.tif") 
+       # proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       # mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
+       # 
        scrveg<-raster("data/islands/scr/veg.tif")
        sriveg<-raster("data/islands/sri/veg.tif")
        mergedveg<-raster::merge(scrveg, sriveg, tolerance = 0.5)
        
+       dem<-raster("data/islands/both/DEM.tif")
+       proj4string(dem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+       veg<-raster("data/islands/both/veg50.tif")
+       proj4string(veg) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
        
-       col <- colorNumeric(palette = "Spectral", domain=values(mergedveg), na.color = "transparent", reverse=TRUE)
+       island <- switch(input$islandvar,
+                        "DEM" = island <- dem,
+                        "Vegetation" = island <- veg)
+       
+       DEMcol <- colorNumeric(palette = "Spectral", domain=values(island), na.color = "transparent", reverse=TRUE)
+       vegcol <- colorFactor(palette = "Spectral", domain=values(island), na.color = "transparent", reverse=TRUE)
+       col <- switch(input$islandvar,
+                     "DEM" = col <- DEMcol,
+                     "Vegetation" = col <- vegcol)
        
        leaflet() %>% addTiles() %>%
-         addRasterImage(mergedveg, colors = col, opacity = 0.8)
+         addRasterImage(island, colors = col, opacity = 0.8) %>% 
+         addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(c("Woodland","Grassland","Woodland","Woodland","Woodland","Woodland","Woodland")))
+                   
+                
+       
          
   
         
