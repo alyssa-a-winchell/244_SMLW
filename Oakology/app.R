@@ -151,16 +151,31 @@ server <- function(input, output) {
                         "DEM" = island <- dem,
                         "Vegetation" = island <- veg)
        
-       DEMcol <- colorNumeric(palette = "Spectral", domain=values(island), na.color = "transparent", reverse=TRUE)
+       DEMcol <- colorNumeric(palette = "BrBG", domain=values(island), na.color = "transparent", reverse=TRUE)
        vegcol <- colorFactor(palette = "Spectral", domain=values(island), na.color = "transparent", reverse=TRUE)
        col <- switch(input$islandvar,
                      "DEM" = col <- DEMcol,
                      "Vegetation" = col <- vegcol)
        
+       DEMlabels<-""
+       veglabels<-c(": Woodland",": Chaparral",": Coastal Scrub",": Grassland",": Riparian",": Dune",": Other")
+       
+       legendlabels <- switch(input$islandvar,
+                     "DEM" = legendlabels <- DEMlabels,
+                     "Vegetation" = legendlabels <- veglabels)
+       
+       DEMtitle<-"Elevation (m)"
+       vegtitle<-"Vegetation Class"
+       
+       legendtitle <- switch(input$islandvar,
+                              "DEM" = legendtitle <- DEMtitle,
+                              "Vegetation" = legendtitle <- vegtitle)
+       
        leaflet() %>% addTiles() %>%
          addRasterImage(island, colors = col, opacity = 0.8) %>% 
-         addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(c("Woodland","Grassland","Woodland","Woodland","Woodland","Woodland","Woodland")))
-                   
+         #addLegend("topright", pal = col, values = values(island))
+         addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(suffix = legendlabels), title = legendtitle)
+                  
                 
        
          
