@@ -22,7 +22,8 @@ setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
               navbarPage("",
-              tabPanel("Summary", "jjjknjk"
+              tabPanel("Summary", "jjjknjk",
+                       mainPanel(imageOutput("oakimage"))
                        ),
               tabPanel("Example",
                        sidebarPanel(
@@ -138,9 +139,30 @@ ui<-fluidPage(theme = shinytheme("readable"),
 )
 
 # Define server logic ----
-server <- function(input, output) {
+server <- function(input, output, session) {
 
   #current wd is "G:/data/GitHub/244_SMLW" for all files
+  
+  # output$oakimage <- renderImage({
+  #   if (is.null(input$picture))
+  #     return(NULL)
+  # 
+  #   if (input$picture == "sri_oak") {
+  #     return(list(
+  #       src = "data/images/sri_oak.png",
+  #       contentType = "image/png",
+  #       alt = "Oaks"
+  #     ))
+  #   } else if (input$picture == "stilted_oaks") {
+  #     return(list(
+  #       src = "data/images/stilted_oaks.png",
+  #       filetype = "image/png",
+  #       alt = "Oaks stilted from soil erosion"
+  #     ))
+  #   }
+  # 
+  # }, deleteFile = FALSE)
+
 
   
      output$sdmmap <- renderLeaflet({
