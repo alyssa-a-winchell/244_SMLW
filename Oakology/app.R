@@ -18,7 +18,7 @@ library(shinyWidgets)
 library(colorspace)
 library(kableExtra)
 
-setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
+#setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
