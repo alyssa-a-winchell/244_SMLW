@@ -16,6 +16,7 @@ library(sf)
 library(RColorBrewer)
 library(shinyWidgets)
 library(colorspace)
+library(kableExtra)
 
 setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
@@ -108,11 +109,13 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                 selectInput("histscenario", "Choose a Scenario", c("No Fog",
                                                                                    "Fog"))),
                          column(4,
-                                leafletOutput("histsdmmap", width=800, height=500)),
-                         column(4,
-                                htmlOutput("historictable"))
+                                leafletOutput("histsdmmap", width=800, height=400))
+                         
                        ),
                        br(),
+                       fluidRow(column(6,offset=2,
+                                       htmlOutput("historictable"))),
+                       
                        br(),
                        fluidRow(
                          column(2,
@@ -132,13 +135,16 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                                                                                   "2040-2069", 
                                                                                                   "2070-2099"), animate=TRUE)),
                          column(4,
-                                leafletOutput("sdmmap", width=800, height=500))
-                       )
+                                leafletOutput("sdmmap", width=800, height=400))
+                       ),
+                       br(),
+                       fluidRow(column(8, offset=2,
+                                       htmlOutput("projtable")))
                        
-              )
+              ) #SDM tab panel
               
-              )
-)
+              )#nav bar page
+)#ui 
 
 # Define server logic ----
 server <- function(input, output, session) {
@@ -235,6 +241,46 @@ server <- function(input, output, session) {
     
   }) #end render leaflet
   
+  output$historictable <- renderText({
+    
+    histscendf<-switch(input$histscenario,
+                     "No Fog"=histscendf<-"nofog",
+                     "Fog"=histscendf<-"fogconstant")
+
+    scrhistcsv<-read_csv(paste0("data/sdm/scr/", histscendf, "/historicsummarytable.csv"))
+    scrhistdata<-scrhistcsv[1,2:4]
+    colnames(scrhistdata)<-c("AUC", "HighestSuit", "PerSuit")
+    scrhistdf<-scrhistdata %>% 
+      mutate(AUC=round(AUC,2)) %>% 
+      mutate(HighestSuit=round(HighestSuit,2)) %>% 
+      mutate(PerSuit=PerSuit*100) %>% 
+      mutate(PerSuit=round(PerSuit,2)) %>% 
+      mutate(Island="Santa Cruz") %>% 
+      select(Island, everything())
+
+    srihistcsv<-read_csv(paste0("data/sdm/sri/", histscendf, "/historicsummarytable.csv"))
+    srihistdata<-srihistcsv[1,2:4]
+    colnames(srihistdata)<-c("AUC", "HighestSuit", "PerSuit")
+    srihistdf<-srihistdata %>% 
+      mutate(AUC=round(AUC,2)) %>% 
+      mutate(HighestSuit=round(HighestSuit,2)) %>% 
+      mutate(PerSuit=PerSuit*100) %>% 
+      mutate(PerSuit=round(PerSuit,2)) %>% 
+      mutate(Island="Santa Rosa") %>% 
+      select(Island, everything())
+    
+    histdf<-rbind(scrhistdf,srihistdf)
+    colnames(histdf)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area")
+    #Renaming so I can have spaces
+    
+    kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
+          booktabs=TRUE, align=c(rep('c',times=4))) %>% 
+      kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>% 
+      row_spec(0, color="black", background="lightblue", bold=TRUE) 
+    
+  })
+  
+  
   
      output$sdmmap <- renderLeaflet({
        
@@ -249,11 +295,11 @@ server <- function(input, output, session) {
                  "Hot-Wet"=proj<-"CCSM4_rcp85",
                  "Warm-Wet"=proj<-"MPI_rcp45", 
                  "Warm-Dry"=proj<-"MIROC_rcp45", 
-                 "Hot-Dry"=proj<-"MIROC_rcp85") #Need to include historic
+                 "Hot-Dry"=proj<-"MIROC_rcp85")
     time<-switch(input$timeperiod,
                  "2010-2039"=time<-"_2010_2039",
                  "2040-2069"=time<-"_2040_2069", 
-                 "2070-2099"=time<-"_2070_2099") #Need to include historic, if historic then no time period and time default defined as ""
+                 "2070-2099"=time<-"_2070_2099")
     
      
        scr<-raster(paste0("data/sdm/scr/",scen,"/", proj, time, ".tif")) 
@@ -280,7 +326,90 @@ server <- function(input, output, session) {
      
    }) #end render leaflet
      
-    
+     output$projtable <- renderText({
+       
+       scendf<-switch(input$scenario,
+                    "No Fog"=scendf<-"nofog",
+                    "Constant Fog"=scendf<-"fogconstant", 
+                    "Fog Increase"=scendf<-"foginc", 
+                    "Fog Decrease"=scendf<-"fogdec", 
+                    "Fog Elevation Threshold"=scendf<-"fogelev")
+       projdf<-switch(input$projection,
+                    "Hot-Wet"=projdf<-"CCSM4_rcp85",
+                    "Warm-Wet"=projdf<-"MPI_rcp45", 
+                    "Warm-Dry"=projdf<-"MIROC_rcp45", 
+                    "Hot-Dry"=projdf<-"MIROC_rcp85")
+       timedf<-switch(input$timeperiod,
+                    "2010-2039"=timedf<-"_2010_2039",
+                    "2040-2069"=timedf<-"_2040_2069", 
+                    "2070-2099"=timedf<-"_2070_2099")
+       
+       projection<-paste0(projdf,timedf)
+       if(projection=="MPI_rcp45_2010_2039"){
+         rownum<-1
+       }else if(projection=="MPI_rcp45_2040_2069"){
+         rownum<-2
+       }else if(projection=="MPI_rcp45_2070_2099"){
+         rownum<-3
+       }else if(projection=="CCSM4_rcp85_2010_2039"){
+         rownum<-4
+       }else if(projection=="CCSM4_rcp85_2040_2069"){
+         rownum<-5
+       }else if(projection=="CCSM4_rcp85_2070_2099"){
+         rownum<-6
+       }else if(projection=="MIROC_rcp45_2010_2039"){
+         rownum<-7
+       }else if(projection=="MIROC_rcp45_2040_2069"){
+         rownum<-8
+       }else if(projection=="MIROC_rcp45_2070_2099"){
+         rownum<-9
+       }else if(projection=="MIROC_rcp85_2010_2039"){
+         rownum<-10
+       }else if(projection=="MIROC_rcp85_2040_2069"){
+         rownum<-11
+       }else if(projection=="MIROC_rcp85_2070_2099"){
+         rownum<-12
+       }else
+         rownum<-4 #default to hot-wet 2010-2039 (shiny first projection)
+       
+       scrprojcsv<-read_csv(paste0("data/sdm/scr/", scendf, "/projectionssummarytable.csv"))
+       scrprojdata<-scrprojcsv[rownum,-(4:6)]
+       colnames(scrprojdata)<-c("Project", "AUC", "HighestSuit", "PerSuit", "PerChg")#rename so easier to change
+       scrprojdf<-scrprojdata[2:5] %>% 
+         mutate(AUC=round(AUC,2)) %>% 
+         mutate(HighestSuit=round(HighestSuit,2)) %>% 
+         mutate(PerSuit=PerSuit*100) %>% 
+         mutate(PerSuit=round(PerSuit,2)) %>% 
+         mutate(PerChg=PerChg*100) %>% 
+         mutate(PerChg=round(PerChg,2)) %>% 
+         mutate(Island="Santa Cruz") %>% 
+         select(Island, everything())
+       
+       sriprojcsv<-read_csv(paste0("data/sdm/sri/", scendf, "/projectionssummarytable.csv"))
+       sriprojdata<-sriprojcsv[rownum,-(4:6)]
+       colnames(sriprojdata)<-c("Project", "AUC", "HighestSuit", "PerSuit", "PerChg")#rename so easier to change
+       sriprojdf<-sriprojdata[2:5] %>% 
+         mutate(AUC=round(AUC,2)) %>% 
+         mutate(HighestSuit=round(HighestSuit,2)) %>% 
+         mutate(PerSuit=PerSuit*100) %>% 
+         mutate(PerSuit=round(PerSuit,2)) %>% 
+         mutate(PerChg=PerChg*100) %>% 
+         mutate(PerChg=round(PerChg,2)) %>% 
+         mutate(Island="Santa Rosa") %>% 
+         select(Island, everything())
+       
+       projecttable<-rbind(scrprojdf,sriprojdf)
+       colnames(projecttable)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area", "Percent Change Suitable Area")
+       #Renaming so I can have spaces
+       
+       #Use kable() function to produce beautiful table of top5 df 
+       kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
+             booktabs=TRUE, align=c(rep('c',times=5))) %>% 
+         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>% 
+         row_spec(0, color="black", background="lightblue", bold=TRUE) 
+       
+       
+     })
    
    
 }#end server
