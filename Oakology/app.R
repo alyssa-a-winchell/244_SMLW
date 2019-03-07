@@ -23,7 +23,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Oakology"),
               navbarPage("",
               tabPanel("Summary", "jjjknjk",
-                       mainPanel(imageOutput("oakimage"))
+                       mainPanel(img(src = "sri_oaks.png"))
                        ),
               tabPanel("Example",
                        sidebarPanel(
@@ -142,28 +142,17 @@ ui<-fluidPage(theme = shinytheme("readable"),
 server <- function(input, output, session) {
 
   #current wd is "G:/data/GitHub/244_SMLW" for all files
-  
+
   # output$oakimage <- renderImage({
-  #   if (is.null(input$picture))
-  #     return(NULL)
   # 
-  #   if (input$picture == "sri_oak") {
-  #     return(list(
-  #       src = "data/images/sri_oak.png",
-  #       contentType = "image/png",
-  #       alt = "Oaks"
-  #     ))
-  #   } else if (input$picture == "stilted_oaks") {
-  #     return(list(
-  #       src = "data/images/stilted_oaks.png",
-  #       filetype = "image/png",
-  #       alt = "Oaks stilted from soil erosion"
-  #     ))
-  #   }
-  # 
+  #   # Return a list containing the filename
+  #   list(src = "data/images/sri_oak.png",
+  #        contentType = 'image/png',
+  #        width = 400,
+  #        height = 300
+  #        )
   # }, deleteFile = FALSE)
-
-
+  
   
      output$sdmmap <- renderLeaflet({
        
