@@ -108,7 +108,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                 selectInput("histscenario", "Choose a Scenario", c("No Fog",
                                                                                    "Fog"))),
                          column(4,
-                                leafletOutput("histsdmmap", width=800, height=500))
+                                leafletOutput("histsdmmap", width=800, height=500)),
+                         column(4,
+                                htmlOutput("historictable"))
                        ),
                        br(),
                        br(),
@@ -152,6 +154,86 @@ server <- function(input, output, session) {
   #        height = 300
   #        )
   # }, deleteFile = FALSE)
+  
+  
+  output$islandmap <- renderLeaflet({
+    
+    # scrdem<-raster("data/islands/scr/DEM.tif") 
+    # proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    # sridem<-raster("data/islands/sri/DEM.tif") 
+    # proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    # mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
+    # 
+    scrveg<-raster("data/islands/scr/veg.tif")
+    sriveg<-raster("data/islands/sri/veg.tif")
+    mergedveg<-raster::merge(scrveg, sriveg, tolerance = 0.5)
+    
+    dem<-raster("data/islands/both/DEM.tif")
+    proj4string(dem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    veg<-raster("data/islands/both/veg50.tif")
+    proj4string(veg) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    
+    island <- switch(input$islandvar,
+                     "DEM" = island <- dem,
+                     "Vegetation" = island <- veg)
+    
+    col <- switch(input$islandvar,
+                  "DEM" = col <- colorNumeric(palette = grDevices::terrain.colors(20), domain=values(island), na.color = "transparent", reverse=FALSE),
+                  "Vegetation" = col <- colorFactor(palette = "Set1", domain=values(island), na.color = "transparent", reverse=FALSE))
+    
+    DEMlabels<-""
+    veglabels<-c(": Woodland",": Chaparral",": Coastal Scrub",": Grassland",": Riparian",": Dune",": Other")
+    
+    legendlabels <- switch(input$islandvar,
+                           "DEM" = legendlabels <- DEMlabels,
+                           "Vegetation" = legendlabels <- veglabels)
+    
+    DEMtitle<-"Elevation (m)"
+    vegtitle<-"Vegetation Class"
+    
+    legendtitle <- switch(input$islandvar,
+                          "DEM" = legendtitle <- DEMtitle,
+                          "Vegetation" = legendtitle <- vegtitle)
+    
+    leaflet() %>% addTiles() %>%
+      addRasterImage(island, colors = col, opacity = 0.8, method = "ngb") %>% 
+      #addLegend("topright", pal = col, values = values(island))
+      addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(suffix = legendlabels), title = legendtitle)
+    
+  }) #end render leaflet
+  
+  
+  
+  output$histsdmmap <- renderLeaflet({
+    
+    
+    histscen<-switch(input$histscenario,
+                     "No Fog"=histscen<-"nofog",
+                     "Fog"=histscen<-"fogconstant")
+    
+    histscr<-raster(paste0("data/sdm/scr/",histscen,"/historic.tif")) 
+    proj4string(histscr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    
+    
+    histsri<-raster(paste0("data/sdm/sri/",histscen,"/historic.tif")) 
+    proj4string(histsri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+    
+    histmerged<-merge(histscr, histsri)
+    
+    histsdmcol <- switch(input$histsdmcolor,
+                         "Spectral" = colorNumeric(palette = "Spectral", domain=values(histmerged), na.color = "transparent", reverse=TRUE),
+                         "Spectral2" = colorNumeric(palette = "Spectral", domain=values(histmerged), na.color = "transparent", reverse=FALSE),
+                         "Viridis" = colorNumeric(palette = "viridis", domain=values(histmerged), na.color = "transparent", reverse=TRUE),
+                         "Magma" = colorNumeric(palette = "magma", domain=values(histmerged), na.color = "transparent", reverse=TRUE))
+    
+    leaflet() %>% addTiles() %>%
+      addRasterImage(histmerged, colors = histsdmcol, opacity = 0.8) %>%
+      #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
+      addLegend("topright", pal = histsdmcol, values = values(histmerged),
+                title = "Suitability", 
+                labFormat = labelFormat(transform=function(histmerged) sort (histmerged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
+    
+  }) #end render leaflet
   
   
      output$sdmmap <- renderLeaflet({
@@ -198,89 +280,7 @@ server <- function(input, output, session) {
      
    }) #end render leaflet
      
-     
-     output$histsdmmap <- renderLeaflet({
-       
-       
-       histscen<-switch(input$histscenario,
-                    "No Fog"=histscen<-"nofog",
-                    "Fog"=histscen<-"fogconstant")
-       
-       histscr<-raster(paste0("data/sdm/scr/",histscen,"/historic.tif")) 
-       proj4string(histscr) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       
-       
-       histsri<-raster(paste0("data/sdm/sri/",histscen,"/historic.tif")) 
-       proj4string(histsri) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       
-       histmerged<-merge(histscr, histsri)
-       
-       histsdmcol <- switch(input$histsdmcolor,
-                        "Spectral" = colorNumeric(palette = "Spectral", domain=values(histmerged), na.color = "transparent", reverse=TRUE),
-                        "Spectral2" = colorNumeric(palette = "Spectral", domain=values(histmerged), na.color = "transparent", reverse=FALSE),
-                        "Viridis" = colorNumeric(palette = "viridis", domain=values(histmerged), na.color = "transparent", reverse=TRUE),
-                        "Magma" = colorNumeric(palette = "magma", domain=values(histmerged), na.color = "transparent", reverse=TRUE))
-       
-       leaflet() %>% addTiles() %>%
-         addRasterImage(histmerged, colors = histsdmcol, opacity = 0.8) %>%
-         #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
-         addLegend("topright", pal = histsdmcol, values = values(histmerged),
-                   title = "Suitability", 
-                   labFormat = labelFormat(transform=function(histmerged) sort (histmerged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
-       
-     }) #end render leaflet
-     
-     output$islandmap <- renderLeaflet({
-       
-       # scrdem<-raster("data/islands/scr/DEM.tif") 
-       # proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       # sridem<-raster("data/islands/sri/DEM.tif") 
-       # proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       # mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
-       # 
-       scrveg<-raster("data/islands/scr/veg.tif")
-       sriveg<-raster("data/islands/sri/veg.tif")
-       mergedveg<-raster::merge(scrveg, sriveg, tolerance = 0.5)
-       
-       dem<-raster("data/islands/both/DEM.tif")
-       proj4string(dem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       veg<-raster("data/islands/both/veg50.tif")
-       proj4string(veg) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-       
-       island <- switch(input$islandvar,
-                        "DEM" = island <- dem,
-                        "Vegetation" = island <- veg)
-       
-       col <- switch(input$islandvar,
-                     "DEM" = col <- colorNumeric(palette = grDevices::terrain.colors(20), domain=values(island), na.color = "transparent", reverse=FALSE),
-                     "Vegetation" = col <- colorFactor(palette = "Set1", domain=values(island), na.color = "transparent", reverse=FALSE))
-       
-       DEMlabels<-""
-       veglabels<-c(": Woodland",": Chaparral",": Coastal Scrub",": Grassland",": Riparian",": Dune",": Other")
-       
-       legendlabels <- switch(input$islandvar,
-                     "DEM" = legendlabels <- DEMlabels,
-                     "Vegetation" = legendlabels <- veglabels)
-       
-       DEMtitle<-"Elevation (m)"
-       vegtitle<-"Vegetation Class"
-       
-       legendtitle <- switch(input$islandvar,
-                              "DEM" = legendtitle <- DEMtitle,
-                              "Vegetation" = legendtitle <- vegtitle)
-       
-       leaflet() %>% addTiles() %>%
-         addRasterImage(island, colors = col, opacity = 0.8, method = "ngb") %>% 
-         #addLegend("topright", pal = col, values = values(island))
-         addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(suffix = legendlabels), title = legendtitle)
-                  
-                
-       
-         
-  
-        
-       
-     }) #end render leaflet
+    
    
    
 }#end server
