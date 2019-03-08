@@ -27,9 +27,152 @@ library(kableExtra)
 ui<-fluidPage(theme = shinytheme("readable"),
               titlePanel("Climate Change Vulnerability Assessment of Island Oaks"),
               navbarPage("Oakology",
-              tabPanel("Summary", "Put the summary text here",
-                       mainPanel(img(src = "sri_oaks.png", width=1200, height=600))
-                       ),
+              tabPanel("Summary",
+                       sidebarPanel(width=3,
+                        h2("Oakology Bren Group Project"),
+                        br(),
+                         h3("App Purpose"),
+                          p("This app was created to show the data and results from the Oakology Group Project
+                            from the Bren School of Environmental Science & Management: Climate Change Vulnerability
+                            Assessment of Quercus tomentella."),
+                          br(),
+                          br(),
+                         h3("How to Use the App"),
+                          p("Include more information on how the app can be used"),
+                         br(),
+                         br(),
+                         h3("More Information"),
+                         p("For more information on the project, you can go to 
+                           https://oakology19.wixsite.com/oakology/island-oaks."),
+                         p("Insert logo images here?")
+                         ),
+                       mainPanel(
+                         tabsetPanel(
+                           tabPanel("Project Overview",
+                                    br(),
+                                    img(src = "sri_oaks.png", width=800, height=400),
+                                    h3("Background"),
+                                    p("Quercus tomentella is the rarest oak species in California andis endemic
+                                      to only six islandsinthe California Island Archipelago (CAIA):Anacapa,
+                                      Guadalupe, San Clemente, Santa Catalina, Santa Cruz, and Santa Rosa
+                                      (Pavlik et al., 1991). Islands oaks are considered a dominant species in the
+                                      CAIA’s oak woodlands,where they provide forest litter, protective habitat for
+                                      other species, and most importantly, soil moisture through fog drip(McCune,
+                                      2005,citation). The past introduction of invasive herbivores from ranching
+                                      activity left lasting impacts on the island oaks’ ability to successful establish
+                                      and disperse."),
+                                    p("Though historical threats have largely been removed from the islands
+                                      in recent years, legacy impacts from grazers are still widespread, and Q. tomentella
+                                      is still encumbered by damaged and fragmented habitat. As a spatially-constrained
+                                      species endemic to the CAIA, Q. tomentellais particularly susceptible to extinction
+                                      from habitat loss or fragmentation and has limited opportunityto re-establish in more
+                                      suitable regions if additional threats force such movement(Harter et al. 2015).As the
+                                      effects of human-induced climate change intensify, island ecologists and managers would
+                                      like to determine appropriate management practices to ensure survival and health of Q.
+                                      tomentella on all six islands across its range."),
+                                    h3("Significance"),
+                                    p("Our clients, The Nature Conservancy and the Santa Barbara Botanic Garden,
+                                      are concerned with the decline of this species as well as other endemic
+                                      species on the Channel Islands. They tasked us with investigating how 
+                                      climate change might affect future island oak distribution to help them 
+                                      adaptively manage this species to increase its resilience and likelihood
+                                      of persistence. Our goal was to model the potential distributional changes
+                                      of the island oak in the future, taking into account the wide uncertainty
+                                      in projections of future climate. Managers can use our comprehensive analysis
+                                      in conjunction with prior known information about the species to inform
+                                      adaptive management planning on the islands to best conserve and protect
+                                      the species under climate change."),
+                                    h3("Objectives"),
+                                    p("List our objectives")
+                                    ),
+                           tabPanel("Data", 
+                                    br(),
+                                    img(src = "stilted_oaks.png", width=800, height=400),
+                                    h3("Overview"),
+                                    p("Data was gathered to perform analyses of how climate change will
+                                      likely impact island oak presence across the CAIA. Our analyses
+                                      required oak presence points, present climate data, future climate
+                                      projections, and island specific data. All layers were resampled
+                                      to the resolution of the coarsest data, 270m, and were projected
+                                      into the NAD83 Teale-Albers coordinate system. Sufficient data
+                                      for the analysis was only available for three of the six islands 
+                                      that contain the island oak— Santa Cruz, Santa Rosa, and Santa 
+                                      Catalina— so analyses were performed for only these three islands."),
+                                    h3("Oak Points"), 
+                                    p("Oak presence points were obtained from The Nature Conservancy,
+                                      The National Park Service, and Laura Kindsvater."),
+                                    h3("Climate Data"),
+                                    p("We acquired current and future climate data and projections from
+                                      the Basin Characterization Model (BCM), a regional hydrologic climate
+                                      model statistically downscaled for California to 270-meter resolution 
+                                      (Flint et al., 2013). BCM provides climate data as averaged 30-year 
+                                      summaries for the current time period defined as 1981-2010 as well as
+                                      for three future time periods (2010-2039, 2040-2069, 2070-2099). We
+                                      selected four future climate scenarios that capture some of the variability
+                                      in climate futures most likely to occur in California. These climate scenarios
+                                      include MIROC rcp8.5 (“hot-dry”), MIROC rcp4.5 (“warm-dry”), CCSM4 rcp4.5
+                                      (“hot-wet”), and MPI rcp4.5 (“warm-wet”) projections."),
+                                    p("INCLUDE LINK TO BCM DATA"),
+                                    h3("Fog Data"),
+                                    p("BCM provides precipitation and temperature-based climate variables, but does 
+                                      not have data available for fog, an important variable for oak species. We obtained
+                                      fog data from Rastogi et al. 2016, that shows the current probability of fog inundation
+                                      for Santa Rosa and Santa Cruz Islands. We developed future fog predictions from the
+                                      current data by projecting historic trends into the future for four possible fog 
+                                      scenarios: constant fog, decreasing fog, increasing fog, and change in fog based
+                                      on an elevational threshold. We used these predictions in tandem with the climate
+                                      future scenarios."),
+                                    h3("Island Data"),
+                                    p("We obtained island specific data from various island managers and sources, including
+                                      island outlines (NPS and CIC), elevation layers (NPS and CIC), soil data (USGS), 
+                                      and vegetation community shapefiles (NPS, TNC, CIC).")
+                                    
+                                    ),
+                           tabPanel("Methodology",
+                                    br(),
+                                    img(src = "sri_oaks.png", width=800, height=400),
+                                    h3("Species Distribution Modeling"),
+                                    p("More on Methods")
+                                    
+                         ),
+                         tabPanel("Sources",
+                                  br(),
+                                  img(src = "sri_oaks.png", width=800, height=400),
+                                  h3("References"),
+                                  p("Flint, Lorraine E., Alan L. Flint, James H. Thorne, and Ryan Boynton. 2013. 
+                                    “Fine-Scale Hydrologic Modeling for Regional Landscape Applications: The California
+                                    Basin Characterization Model Development and Performance.” Ecological Processes 2
+                                    (July): 25. https://doi.org/10.1186/2192-1709-2-25."),
+                                  p("Flint, L.E. and Flint, A.L., 2014, California Basin Characterization Model: A Dataset
+                                    of Historical and Future Hydrologic Response to Climate Change, (ver. 1.1, May 2017):
+                                    U.S. Geological Survey Data Release, https://doi.org/10.5066/F76T0JPB."),
+                                  p("Harter, David E. V., Severin D. H. Irl, Bumsuk Seo, Manuel J. Steinbauer, 
+                                      Rosemary Gillespie, Kostas A. Triantis, José-María Fernández-Palacios, and Carl 
+                                    Beierkuhnlein. 2015. “Impacts of Global Climate Change on the Floras of Oceanic 
+                                    Islands – Projections, Implications and Current Knowledge.” Perspectives in Plant
+                                    Ecology, Evolution and Systematics 17 (2): 160–83.
+                                    https://doi.org/10.1016/j.ppees.2015.01.003."),
+                                  p("Kindsvater, L. (2006). Conservation and Restoration of the Endemic Island Oak, Quercus 
+                                    tomentella in Channel Islands National Park using a Habitat Approach. University of 
+                                    California - Davis, Davis, CA."),
+                                  p("Kindsvater, L. (2010). Plant communities associated with the rare, paleoendemic oak, 
+                                    Quercus tomentella, on Santa Cruz and Santa Rosa, Islands, California. Oak Ecosystem 
+                                    Restoration on Santa Catalina Island, California: Proceedings of an on-Island Workshop, 
+                                    February 2-4, 2007, 16."),
+                                  p("McCune, J. (2005). Report on the census and survey of Island oak (Quercus 
+                                    tomentella Engelm.) and canyon live oak (Quercus chrysolepis Liebm.) groves
+                                    on Catalina Island, 2004 and 2005. Unpublished report prepared for the Catalina
+                                    Island Conservancy, Avalon, CA."),
+                                  p("Pavlik, B.M., P.C. Muick, et al. 1991. Oaks of California. Cachuma Press,
+                                    Los Olivos, CA and the California Oak Foundation, Oakland, CA."),
+                                  p("Rastogi, B., Williams, A. P., Fischer, D. T., Iacobellis, S. F., McEachern, K., Carvalho,
+                                    L., ... & Still, C. J. (2016). Spatial and temporal patterns of cloud cover and fog 
+                                    inundation in coastal California: Ecological implications. Earth Interactions, 20(15), 1-19.")
+                                  
+                         )
+                       )
+      
+                       )),
               tabPanel("Example",
                        sidebarPanel(
                          fileInput("file", "File input:"),
@@ -62,7 +205,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("Islands",
                        fluidRow(
                          column(2,selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation"))),
-                         column(4,leafletOutput("islandmap", width=800, height=400))
+                         column(4,leafletOutput("islandmap", width=1200, height=800))
                        )
                        ),
               tabPanel("SDM",
@@ -74,14 +217,14 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                                                                    "Fog"))),
                          column(4,
                                 leafletOutput("histsdmmap", width=800, height=400))
-                         
+
                        ),
                        br(),
                        fluidRow(column(6, offset=2,
                                        htmlOutput("historictable")
                                        #gt_output("historictable")
                                        )),
-                       
+
                        br(),
                        fluidRow(
                          column(2,
@@ -97,8 +240,8 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                                                                    "Warm-Dry",
                                                                                    "Hot-Dry")), #figure out how to make historic conditional for time period
                                 #selectInput("timeperiod", "Choose a Time Period", c("2010-2039","2040-2069", "2070-2099")),
-                                sliderTextInput("timeperiod", "Choose a Time Period", choices = c("2010-2039", 
-                                                                                                  "2040-2069", 
+                                sliderTextInput("timeperiod", "Choose a Time Period", choices = c("2010-2039",
+                                                                                                  "2040-2069",
                                                                                                   "2070-2099"), animate=TRUE)),
                          column(4,
                                 leafletOutput("sdmmap", width=800, height=400))
@@ -106,8 +249,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
                        br(),
                        fluidRow(column(8, offset=2,
                                        htmlOutput("projtable")))
-                       
+
               ) #SDM tab panel
+              
               
               )#nav bar page
 )#ui 
