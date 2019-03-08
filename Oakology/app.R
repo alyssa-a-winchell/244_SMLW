@@ -17,14 +17,17 @@ library(RColorBrewer)
 library(shinyWidgets)
 library(colorspace)
 library(kableExtra)
+library(gt)
+# install.packages("devtools")
+# remotes::install_github("rstudio/gt")
 
 #setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
 ui<-fluidPage(theme = shinytheme("readable"),
-              titlePanel("Oakology"),
-              navbarPage("",
-              tabPanel("Summary", "jjjknjk",
-                       mainPanel(img(src = "sri_oaks.png"))
+              titlePanel("Climate Change Vulnerability Assessment of Island Oaks"),
+              navbarPage("Oakology",
+              tabPanel("Summary", "Put the summary text here",
+                       mainPanel(img(src = "sri_oaks.png", width=1200, height=600))
                        ),
               tabPanel("Example",
                        sidebarPanel(
@@ -58,49 +61,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
               tabPanel("Islands",
                        fluidRow(
                          column(2,selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation"))),
-                         column(4,leafletOutput("islandmap", width=800, height=500))
+                         column(4,leafletOutput("islandmap", width=800, height=400))
                        )
-                       # sidebarPanel(
-                       #   selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation"))
-                       # ),
-                       # mainPanel(
-                       #  
-                       #   leafletOutput("islandmap", width=1000, height=500)
-                       # )
                        ),
-              # tabPanel("SDM",
-              #          # sidebarPanel(selectInput("histsdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
-              #          #              selectInput("histscenario", "Choose a Scenario", c("No Fog",
-              #          #                                                             "Fog"))),
-              #          #mainPanel(leafletOutput("histsdmmap", width=1000, height=500)),
-              #          sidebarPanel(
-              #            selectInput("histsdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
-              #            selectInput("histscenario", "Choose a Scenario", c("No Fog",
-              #                                                               "Fog")),
-              #            br(),
-              #            br(),
-              #            selectInput("sdmcolor", "Choose a Color Palette", c("Spectral","Spectral2" ,"Viridis", "Magma")),
-              #            selectInput("scenario", "Choose a Scenario", c("No Fog",
-              #                                                           "Constant Fog",
-              #                                                           "Fog Increase",
-              #                                                           "Fog Decrease",
-              #                                                           "Fog Elevation Threshold")),
-              #            selectInput("projection", "Choose a Projection", c("Hot-Wet",
-              #                                                               "Warm-Wet",
-              #                                                               "Warm-Dry",
-              #                                                               "Hot-Dry")), #figure out how to make historic conditional for time period
-              #            #selectInput("timeperiod", "Choose a Time Period", c("2010-2039","2040-2069", "2070-2099")),
-              #            sliderTextInput("timeperiod", "Choose a Time Period", choices = c("2010-2039", 
-              #                                                                              "2040-2069", 
-              #                                                                              "2070-2099"), animate=TRUE)
-              #          ),
-              #        
-              #          mainPanel(
-              #            leafletOutput("histsdmmap", width=1000, height=500),
-              #            leafletOutput("sdmmap", width=1000, height=500)
-              #                    )
-              #          
-              #          )
               tabPanel("SDM",
                        fluidRow(
                          column(2,
@@ -113,8 +76,10 @@ ui<-fluidPage(theme = shinytheme("readable"),
                          
                        ),
                        br(),
-                       fluidRow(column(6,offset=2,
-                                       htmlOutput("historictable"))),
+                       fluidRow(column(6,
+                                       #htmlOutput("historictable")
+                                       gt_output("historictable")
+                                       )),
                        
                        br(),
                        fluidRow(
@@ -241,7 +206,7 @@ server <- function(input, output, session) {
     
   }) #end render leaflet
   
-  output$historictable <- renderText({
+  output$historictable <- render_gt({
     
     histscendf<-switch(input$histscenario,
                      "No Fog"=histscendf<-"nofog",
@@ -273,10 +238,25 @@ server <- function(input, output, session) {
     colnames(histdf)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area")
     #Renaming so I can have spaces
     
-    kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
-          booktabs=TRUE, align=c(rep('c',times=4))) %>% 
-      kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>% 
-      row_spec(0, color="black", background="lightblue", bold=TRUE) 
+   histdf %>% 
+      gt() %>% 
+     tab_header(
+       title = "Historic SDM"
+     ) %>% 
+     tab_options(
+       table.background.color = "white",
+       column_labels.background.color = "lightblue",
+       heading.border.bottom.color = "black",
+       heading.title.font.size = 16,
+       heading.subtitle.font.size = 14,
+       column_labels.font.size = 14,
+       table.font.size = 12
+     )
+    
+    # kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
+    #       booktabs=TRUE, align=c(rep('c',times=4))) %>% 
+    #   kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>% 
+    #   row_spec(0, color="black", background="lightblue", bold=TRUE) 
     
   })
   
@@ -403,10 +383,12 @@ server <- function(input, output, session) {
        #Renaming so I can have spaces
        
        #Use kable() function to produce beautiful table of top5 df 
-       kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
-             booktabs=TRUE, align=c(rep('c',times=5))) %>% 
-         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>% 
-         row_spec(0, color="black", background="lightblue", bold=TRUE) 
+       # kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
+       #       booktabs=TRUE, align=c(rep('c',times=5))) %>% 
+       #   kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>% 
+       #   row_spec(0, color="black", background="lightblue", bold=TRUE) 
+       kable(projecttable) %>% 
+         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12))
        
        
      })
