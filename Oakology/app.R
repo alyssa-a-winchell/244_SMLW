@@ -17,8 +17,9 @@ library(RColorBrewer)
 library(shinyWidgets)
 library(colorspace)
 library(kableExtra)
-library(gt)
+# library(gt)
 # install.packages("devtools")
+# library(devtools)
 # remotes::install_github("rstudio/gt")
 
 #setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
