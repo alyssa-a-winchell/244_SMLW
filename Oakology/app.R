@@ -17,7 +17,7 @@ library(RColorBrewer)
 library(shinyWidgets)
 library(colorspace)
 library(kableExtra)
-# library(gt)
+#library(gt)
 # install.packages("devtools")
 # library(devtools)
 # remotes::install_github("rstudio/gt")
@@ -77,9 +77,9 @@ ui<-fluidPage(theme = shinytheme("readable"),
                          
                        ),
                        br(),
-                       fluidRow(column(6,
-                                       #htmlOutput("historictable")
-                                       gt_output("historictable")
+                       fluidRow(column(6, offset=2,
+                                       htmlOutput("historictable")
+                                       #gt_output("historictable")
                                        )),
                        
                        br(),
@@ -207,7 +207,7 @@ server <- function(input, output, session) {
     
   }) #end render leaflet
   
-  output$historictable <- render_gt({
+  output$historictable <- renderText({ #switch to render_gt if want gt table
     
     histscendf<-switch(input$histscenario,
                      "No Fog"=histscendf<-"nofog",
@@ -239,25 +239,25 @@ server <- function(input, output, session) {
     colnames(histdf)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area")
     #Renaming so I can have spaces
     
-   histdf %>% 
-      gt() %>% 
-     tab_header(
-       title = "Historic SDM"
-     ) %>% 
-     tab_options(
-       table.background.color = "white",
-       column_labels.background.color = "lightblue",
-       heading.border.bottom.color = "black",
-       heading.title.font.size = 16,
-       heading.subtitle.font.size = 14,
-       column_labels.font.size = 14,
-       table.font.size = 12
-     )
+   # histdf %>% 
+   #    gt() %>% 
+   #   tab_header(
+   #     title = "Historic SDM"
+   #   ) %>% 
+   #   tab_options(
+   #     table.background.color = "white",
+   #     column_labels.background.color = "lightblue",
+   #     heading.border.bottom.color = "black",
+   #     heading.title.font.size = 16,
+   #     heading.subtitle.font.size = 14,
+   #     column_labels.font.size = 14,
+   #     table.font.size = 12
+   #   )
     
-    # kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
-    #       booktabs=TRUE, align=c(rep('c',times=4))) %>% 
-    #   kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>% 
-    #   row_spec(0, color="black", background="lightblue", bold=TRUE) 
+    kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
+          booktabs=TRUE, align=c(rep('c',times=4))) %>%
+      kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>%
+      row_spec(0, color="black", background="lightblue", bold=TRUE)
     
   })
   
@@ -383,13 +383,12 @@ server <- function(input, output, session) {
        colnames(projecttable)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area", "Percent Change Suitable Area")
        #Renaming so I can have spaces
        
-       #Use kable() function to produce beautiful table of top5 df 
-       # kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
-       #       booktabs=TRUE, align=c(rep('c',times=5))) %>% 
-       #   kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>% 
-       #   row_spec(0, color="black", background="lightblue", bold=TRUE) 
-       kable(projecttable) %>% 
-         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12))
+       kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
+             booktabs=TRUE, align=c(rep('c',times=5))) %>%
+         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>%
+         row_spec(0, color="black", background="lightblue", bold=TRUE)
+       # kable(projecttable) %>% 
+       #   kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12))
        
        
      })
