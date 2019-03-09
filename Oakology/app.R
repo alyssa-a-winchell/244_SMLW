@@ -17,10 +17,6 @@ library(RColorBrewer)
 library(shinyWidgets)
 library(colorspace)
 library(kableExtra)
-#library(gt)
-# install.packages("devtools")
-# library(devtools)
-# remotes::install_github("rstudio/gt")
 
 #setwd("G:/data/GitHub/244_SMLW/Oakology")#Set wd just for running here, the app wd includes Oakology
 
@@ -31,6 +27,8 @@ ui<-fluidPage(theme = shinytheme("readable"),
                        sidebarPanel(width=3,
                         h2("Oakology Bren Group Project"),
                         br(),
+                          h5("Creators:"),
+                           p("Sofie McComb, Jazmine Uy, Alyssa Winchell, and Laura Wolf"),
                          h3("App Purpose"),
                           p("This app was created to show the data and results from the Oakology Group Project
                             from the Bren School of Environmental Science & Management: Climate Change Vulnerability
@@ -42,31 +40,31 @@ ui<-fluidPage(theme = shinytheme("readable"),
                          br(),
                          br(),
                          h3("More Information"),
-                         p("For more information on the project, you can go to 
-                           https://oakology19.wixsite.com/oakology/island-oaks."),
-                         p("Insert logo images here?")
+                         p("For more information on the project, you can go to the following link:"),
+                        uiOutput("tab1"),
+                        br()
                          ),
                        mainPanel(
                          tabsetPanel(
                            tabPanel("Project Overview",
                                     br(),
-                                    img(src = "sri_oaks.png", width=800, height=400),
+                                    img(src = "sri_oaks.png", width=750, height=500),
                                     h3("Background"),
-                                    p("Quercus tomentella is the rarest oak species in California andis endemic
-                                      to only six islandsinthe California Island Archipelago (CAIA):Anacapa,
+                                    p("Quercus tomentella is the rarest oak species in California and is endemic
+                                      to only six islands in the California Island Archipelago (CAIA): Anacapa,
                                       Guadalupe, San Clemente, Santa Catalina, Santa Cruz, and Santa Rosa
                                       (Pavlik et al., 1991). Islands oaks are considered a dominant species in the
                                       CAIA’s oak woodlands,where they provide forest litter, protective habitat for
-                                      other species, and most importantly, soil moisture through fog drip(McCune,
+                                      other species, and most importantly, soil moisture through fog drip (McCune,
                                       2005,citation). The past introduction of invasive herbivores from ranching
                                       activity left lasting impacts on the island oaks’ ability to successful establish
                                       and disperse."),
                                     p("Though historical threats have largely been removed from the islands
                                       in recent years, legacy impacts from grazers are still widespread, and Q. tomentella
                                       is still encumbered by damaged and fragmented habitat. As a spatially-constrained
-                                      species endemic to the CAIA, Q. tomentellais particularly susceptible to extinction
-                                      from habitat loss or fragmentation and has limited opportunityto re-establish in more
-                                      suitable regions if additional threats force such movement(Harter et al. 2015).As the
+                                      species endemic to the CAIA, Q. tomentella is particularly susceptible to extinction
+                                      from habitat loss or fragmentation and has limited opportunity to re-establish in more
+                                      suitable regions if additional threats force such movement(Harter et al. 2015). As the
                                       effects of human-induced climate change intensify, island ecologists and managers would
                                       like to determine appropriate management practices to ensure survival and health of Q.
                                       tomentella on all six islands across its range."),
@@ -87,7 +85,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                     ),
                            tabPanel("Data", 
                                     br(),
-                                    img(src = "stilted_oaks.png", width=800, height=400),
+                                    img(src = "stilted_oaks.png", width=750, height=500),
                                     h3("Overview"),
                                     p("Data was gathered to perform analyses of how climate change will
                                       likely impact island oak presence across the CAIA. Our analyses
@@ -112,7 +110,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                       in climate futures most likely to occur in California. These climate scenarios
                                       include MIROC rcp8.5 (“hot-dry”), MIROC rcp4.5 (“warm-dry”), CCSM4 rcp4.5
                                       (“hot-wet”), and MPI rcp4.5 (“warm-wet”) projections."),
-                                    p("INCLUDE LINK TO BCM DATA"),
+                                    uiOutput("tab2"),
                                     h3("Fog Data"),
                                     p("BCM provides precipitation and temperature-based climate variables, but does 
                                       not have data available for fog, an important variable for oak species. We obtained
@@ -130,14 +128,15 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                     ),
                            tabPanel("Methodology",
                                     br(),
-                                    img(src = "sri_oaks.png", width=800, height=400),
+                                    img(src = "tree_tunnel.jpg", width=750, height=500),
                                     h3("Species Distribution Modeling"),
-                                    p("More on Methods")
+                                    p("More on Methods"),
+                                    img(src = "maxent.png", width=550, height=300)
                                     
                          ),
                          tabPanel("Sources",
                                   br(),
-                                  img(src = "sri_oaks.png", width=800, height=400),
+                                  
                                   h3("References"),
                                   p("Flint, Lorraine E., Alan L. Flint, James H. Thorne, and Ryan Boynton. 2013. 
                                     “Fine-Scale Hydrologic Modeling for Regional Landscape Applications: The California
@@ -167,45 +166,32 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                     Los Olivos, CA and the California Oak Foundation, Oakland, CA."),
                                   p("Rastogi, B., Williams, A. P., Fischer, D. T., Iacobellis, S. F., McEachern, K., Carvalho,
                                     L., ... & Still, C. J. (2016). Spatial and temporal patterns of cloud cover and fog 
-                                    inundation in coastal California: Ecological implications. Earth Interactions, 20(15), 1-19.")
+                                    inundation in coastal California: Ecological implications. Earth Interactions, 20(15), 1-19."),
+                                  br(),
+                                  img(src = "landscape_soledad_oaks.jpg", width=900, height=600),
+                                  br(),
+                                  br()
                                   
                          )
-                       )
+                       ),
+                       br(),
+                       br(),
+                       fluidRow(
+                         column(2,img(src = "bren.png", width=180, height=60)),
+                         column(2, offset = 2, img(src = "tnc_logo.png", width=210, height=60)),
+                         column(2, offset = 2, img(src = "sbbg_logo.jpg", width=210, height=60))
+                                ),
+                       
+                       br(),
+                       br(),
+                       br()
+                    
       
                        )),
-              tabPanel("Example",
-                       sidebarPanel(
-                         fileInput("file", "File input:"),
-                         textInput("txt", "Text input:", "general"),
-                         sliderInput("slider", "Slider input:", 1, 100, 30),
-                         tags$h5("Deafult actionButton:"),
-                         actionButton("action", "Search"),
-                         
-                         tags$h5("actionButton with CSS class:"),
-                         actionButton("action2", "Action button", class = "btn-primary")
-                       ),
-                       mainPanel(
-                         tabsetPanel(
-                           tabPanel("Tab 1",
-                                    h4("Table"),
-                                    tableOutput("table"),
-                                    h4("Verbatim text output"),
-                                    verbatimTextOutput("txtout"),
-                                    h1("Header 1"),
-                                    h2("Header 2"),
-                                    h3("Header 3"),
-                                    h4("Header 4"),
-                                    h5("Header 5")
-                           ),
-                           tabPanel("Tab 2", "This panel is intentionally left blank"),
-                           tabPanel("Tab 3", "This panel is intentionally left blank")
-                         )
-                       )
-              ),
               tabPanel("Islands",
                        fluidRow(
                          column(2,selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation"))),
-                         column(4,leafletOutput("islandmap", width=1200, height=800))
+                         column(4,leafletOutput("islandmap", width=800, height=400))
                        )
                        ),
               tabPanel("SDM",
@@ -222,7 +208,6 @@ ui<-fluidPage(theme = shinytheme("readable"),
                        br(),
                        fluidRow(column(6, offset=2,
                                        htmlOutput("historictable")
-                                       #gt_output("historictable")
                                        )),
 
                        br(),
@@ -260,26 +245,18 @@ ui<-fluidPage(theme = shinytheme("readable"),
 server <- function(input, output, session) {
 
   #current wd is "G:/data/GitHub/244_SMLW" for all files
-
-  # output$oakimage <- renderImage({
-  # 
-  #   # Return a list containing the filename
-  #   list(src = "data/images/sri_oak.png",
-  #        contentType = 'image/png',
-  #        width = 400,
-  #        height = 300
-  #        )
-  # }, deleteFile = FALSE)
   
+  url1 <- a("Oakology Wesbite", href="https://oakology19.wixsite.com/oakology/island-oaks")
+  output$tab1 <- renderUI({
+    tagList("", url1)
+  })
+  
+  url2 <- a("BCM Data", href="http://climate.calcommons.org/bcm")
+  output$tab2 <- renderUI({
+    tagList("Link:", url2)
+  })
   
   output$islandmap <- renderLeaflet({
-    
-    # scrdem<-raster("data/islands/scr/DEM.tif") 
-    # proj4string(scrdem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-    # sridem<-raster("data/islands/sri/DEM.tif") 
-    # proj4string(sridem) <- CRS("+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
-    # mergeddem<-raster::merge(scrdem, sridem, tolerance = 0.5)
-    # 
     scrveg<-raster("data/islands/scr/veg.tif")
     sriveg<-raster("data/islands/sri/veg.tif")
     mergedveg<-raster::merge(scrveg, sriveg, tolerance = 0.5)
@@ -312,8 +289,8 @@ server <- function(input, output, session) {
                           "Vegetation" = legendtitle <- vegtitle)
     
     leaflet() %>% addTiles() %>%
+      addProviderTiles(providers$OpenStreetMap.Mapnik) %>% 
       addRasterImage(island, colors = col, opacity = 0.8, method = "ngb") %>% 
-      #addLegend("topright", pal = col, values = values(island))
       addLegend("topright", pal = col, values = values(island), labFormat = labelFormat(suffix = legendlabels), title = legendtitle)
     
   }) #end render leaflet
@@ -343,8 +320,8 @@ server <- function(input, output, session) {
                          "Magma" = colorNumeric(palette = "magma", domain=values(histmerged), na.color = "transparent", reverse=TRUE))
     
     leaflet() %>% addTiles() %>%
+      addProviderTiles(providers$OpenStreetMap.Mapnik) %>% 
       addRasterImage(histmerged, colors = histsdmcol, opacity = 0.8) %>%
-      #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
       addLegend("topright", pal = histsdmcol, values = values(histmerged),
                 title = "Suitability", 
                 labFormat = labelFormat(transform=function(histmerged) sort (histmerged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
@@ -380,28 +357,15 @@ server <- function(input, output, session) {
       select(Island, everything())
     
     histdf<-rbind(scrhistdf,srihistdf)
-    colnames(histdf)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area")
+    colnames(histdf)<- c("Island", "Avg Test AUC", "Highest Suitability", "% Suitable")
     #Renaming so I can have spaces
-    
-   # histdf %>% 
-   #    gt() %>% 
-   #   tab_header(
-   #     title = "Historic SDM"
-   #   ) %>% 
-   #   tab_options(
-   #     table.background.color = "white",
-   #     column_labels.background.color = "lightblue",
-   #     heading.border.bottom.color = "black",
-   #     heading.title.font.size = 16,
-   #     heading.subtitle.font.size = 14,
-   #     column_labels.font.size = 14,
-   #     table.font.size = 12
-   #   )
     
     kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
           booktabs=TRUE, align=c(rep('c',times=4))) %>%
-      kable_styling(bootstrap_options=c("striped", "condensed",full_width=F, font_size=12)) %>%
-      row_spec(0, color="black", background="lightblue", bold=TRUE)
+      kable_styling(bootstrap_options=c("condensed", font_size=12),full_width=F, position="left") %>%
+      row_spec(0, color="black", background="lightblue", bold=TRUE) %>% 
+      row_spec(1:2, background="#F8F9F9") %>% 
+      column_spec(1:4, width="5cm")
     
   })
   
@@ -443,8 +407,8 @@ server <- function(input, output, session) {
                       "Magma" = colorNumeric(palette = "magma", domain=values(merged), na.color = "transparent", reverse=TRUE))
      
      leaflet() %>% addTiles() %>%
+       addProviderTiles(providers$OpenStreetMap.Mapnik) %>% 
        addRasterImage(merged, colors = sdmcol, opacity = 0.8) %>%
-       #setView(lng=-13388304, lat=4012916, zoom=20) %>% #Figure out how to set view extent
        addLegend("topright", pal = sdmcol, values = values(merged),
                  title = "Suitability", 
                  labFormat = labelFormat(transform=function(merged) sort (merged, decreasing=FALSE))) #decreasing false until can figure out how to reverse legend colors
@@ -524,15 +488,15 @@ server <- function(input, output, session) {
          select(Island, everything())
        
        projecttable<-rbind(scrprojdf,sriprojdf)
-       colnames(projecttable)<- c("Island", "Average Test AUC", "Highest Predicted Suitability", "Percent Suitable Area", "Percent Change Suitable Area")
+       colnames(projecttable)<- c("Island", "Avg Test AUC", "Highest Suitability", "% Suitable", "% Change")
        #Renaming so I can have spaces
        
        kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
              booktabs=TRUE, align=c(rep('c',times=5))) %>%
-         kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12)) %>%
-         row_spec(0, color="black", background="lightblue", bold=TRUE)
-       # kable(projecttable) %>% 
-       #   kable_styling(bootstrap_options=c("striped", "condensed", full_width=F, font_size=12))
+         kable_styling(bootstrap_options=c("striped", "condensed",font_size=12), full_width=FALSE,position="left") %>%
+         row_spec(0, color="black", background="lightblue", bold=TRUE) %>% 
+         row_spec(1:2, background="#F8F9F9") %>% 
+         column_spec(1:5, width="4.5cm")
        
        
      })
