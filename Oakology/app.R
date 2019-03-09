@@ -29,18 +29,20 @@ ui<-fluidPage(theme = shinytheme("readable"),
                         br(),
                           h5("Creators:"),
                            p("Sofie McComb, Jazmine Uy, Alyssa Winchell, and Laura Wolf"),
-                         h3("App Purpose"),
-                          p("This app was created to show the data and results from the Oakology Group Project
-                            from the Bren School of Environmental Science & Management: Climate Change Vulnerability
-                            Assessment of Quercus tomentella."),
-                          br(),
+                        br(),
+                         h3("Purpose of the App"),
+                          p("This app was created to easily explore the data and selected results from the Oakology
+                            Group Project at the Bren School of Environmental Science & Management, titled Climate 
+                            Change Vulnerability Assessment of the Island Oak (Quercus tomentella). The application 
+                            focuses on Santa Cruz and Santa Rosa Islands, due to data sharing restrictions and ease of visualization. "),
                           br(),
                          h3("How to Use the App"),
-                          p("Include more information on how the app can be used"),
+                          p("The various tabs in this application provide an overview of the data, methodology, and results 
+                            used in the analysis of island oaks and their potential climate vulnerability. All tabs provide 
+                            the relevant information for Santa Cruz and Santa Rosa Islands, the focus of the application. 
+                            For more in-depth information on what each tab provides, see “Tab Summary” under the Summary tab."),
                          br(),
-                         br(),
-                         h3("More Information"),
-                         p("For more information on the project, you can go to the following link:"),
+                         p("For more information on the project and our team, you can go to our group project website:"),
                         uiOutput("tab1"),
                         br()
                          ),
@@ -49,6 +51,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
                            tabPanel("Project Overview",
                                     br(),
                                     img(src = "sri_oaks.png", width=750, height=500),
+                                    p("Photo: Denise Knapp"),
                                     h3("Background"),
                                     p("Quercus tomentella is the rarest oak species in California and is endemic
                                       to only six islands in the California Island Archipelago (CAIA): Anacapa,
@@ -86,6 +89,7 @@ ui<-fluidPage(theme = shinytheme("readable"),
                            tabPanel("Data", 
                                     br(),
                                     img(src = "stilted_oaks.png", width=750, height=500),
+                                    p("Photo: Denise Knapp"),
                                     h3("Overview"),
                                     p("Data was gathered to perform analyses of how climate change will
                                       likely impact island oak presence across the CAIA. Our analyses
@@ -129,14 +133,62 @@ ui<-fluidPage(theme = shinytheme("readable"),
                            tabPanel("Methodology",
                                     br(),
                                     img(src = "tree_tunnel.jpg", width=750, height=500),
+                                    p("Photo: Denise Knapp"),
                                     h3("Species Distribution Modeling"),
                                     p("More on Methods"),
                                     img(src = "maxent.png", width=550, height=300)
                                     
                          ),
+                         tabPanel("Tab Summary",
+                                  br(),
+                                  img(src = "quto_fog.jpg", width=750, height=500),
+                                  p("Photo: Denise Knapp"),
+                                  p("This section provides a very detailed explanation of what can be found and explored on each tab."),
+                                  h3("Summary"),
+                                  p("The summary tab provides essential information on the project background, significance, objectives, 
+                                    data, methodology, and sources, and should be used as a reference for the other slides."),
+                                  h3("Oaks"),
+                                  p("The oak tab displays the island oak presence points on both islands, which can be visualized in a wide variety
+                                    of colors. Santa Rosa has age structure information explorable for a subset of its points, so users can see which of 
+                                    the oak points are adults and which are seedlings. The all oaks selection visualizes adults and seedlings, in addition
+                                    to unknown age oaks. "),
+                                  h3("Islands"),
+                                  p("The island tab visualizes the digital elevation model (DEM) and vegetation class layers for Santa Cruz and Santa Rosa.
+                                    Users can select between these two layers and can interactively zoom in."),
+                                  h3("Climate"),
+                                  p("The climate tab provides the Basin Characterization Model (BCM) climate layers available for the islands. Users can select
+                                    between four different climate variables, four future climate projections, and three future time periods. Users can compare differences
+                                    in climate between projected future climate and current (historic) climate."),
+                                  h3("SDM"),
+                                  p("The SDM tab provides results from the species distribution model (SDM) analyses for the island oak. These results show the predicted
+                                    current and future probability of presence of island oaks across the islands. It is the most complex tab, so we recommend thoroughly reading
+                                    below to have a better understanding of what we are visualizing. For more information on SDM analysis and the tools used, see the methodology
+                                    tab under summary."),
+                                  p("The top panel displays the SDM results for the historic time period (1981 – 2010), showing the current predicted distribution of the species is
+                                    on Santa Cruz and Santa Rosa. Users can select different color palettes, for which color scale best translates the information, and can select between
+                                    two scenarios— ‘no fog’ or ‘fog’—based on whether or not fog data was included in the analysis."),
+                                  p("The bottom panel displays the SDM results for future projections, and can be visualized for a combination of fog scenarios, climate projections, and time
+                                    periods, across a variety of color palettes. If the ‘no fog’ option is selected in historic, then ‘no fog’ would be the best choice to visualize for 
+                                    the projected option to make an accurate comparison. If the ‘fog’ option for historic is selected, users should choose one of the four future fog scenarios
+                                    (constant, increase, decrease, elevation threshold). Users can select the play button under the time period slider bar to visualize the change in results of
+                                    a future scenario across time."),
+                                  p("The tables underneath each map are updated based on the selection of historic or future projected SDM scenario. The tables provide information on the average 
+                                    test Area Under the Curve (AUC) metric, highest predicted suitability value, and percent of the island deemed suitable for island oak climate habitat under each
+                                    scenario. In the projected table, the percent change in predicted suitable habitat compared to the historic scenario is provided. AUC values are good metrics of 
+                                    model fit and model predictive power, and range from 0-1, with a value close to 1 meaning that errors are minimized with regards to false positives
+                                    and false negatives. The SDM model output predicts the probability of species presence from 0 to 1, or low to high potential habitat suitability,
+                                    as illustrated in the map and given by the highest predicted suitability value in the table. Lastly, we determined the percent of the island
+                                    deemed as suitable island oak habitat under each scenario. This calculation is based on a binary threshold value set by the MaxEnt output
+                                    maximum training specificity + sensitivity value, which is the current practice for selecting MaxEnt suitability threshold values 
+                                    (Liu, White, and Newell 2013). The tables give the percent suitable area and percent change in suitability depending on these 
+                                    threshold values, which typically range from about 0.15-0.4.  The binary interpretation of island oak habitat suitability facilitates
+                                    comparisons between future scenarios to better understand the range of variability and uncertainty in the persistence of the oak 
+                                    across islands and potential futures."),
+                                  br(),
+                                  br()
+                                  ),
                          tabPanel("Sources",
                                   br(),
-                                  
                                   h3("References"),
                                   p("Flint, Lorraine E., Alan L. Flint, James H. Thorne, and Ryan Boynton. 2013. 
                                     “Fine-Scale Hydrologic Modeling for Regional Landscape Applications: The California
@@ -145,12 +197,16 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                   p("Flint, L.E. and Flint, A.L., 2014, California Basin Characterization Model: A Dataset
                                     of Historical and Future Hydrologic Response to Climate Change, (ver. 1.1, May 2017):
                                     U.S. Geological Survey Data Release, https://doi.org/10.5066/F76T0JPB."),
+                                  p("Franklin, J. (2010). Mapping Species Distributions: Spatial Inference and Prediction.
+                                    Cambridge: Cambridge University Press. https://doi.org/10.1017/CBO9780511810602."),
                                   p("Harter, David E. V., Severin D. H. Irl, Bumsuk Seo, Manuel J. Steinbauer, 
                                       Rosemary Gillespie, Kostas A. Triantis, José-María Fernández-Palacios, and Carl 
                                     Beierkuhnlein. 2015. “Impacts of Global Climate Change on the Floras of Oceanic 
                                     Islands – Projections, Implications and Current Knowledge.” Perspectives in Plant
                                     Ecology, Evolution and Systematics 17 (2): 160–83.
                                     https://doi.org/10.1016/j.ppees.2015.01.003."),
+                                  p("Hutchinson, E. (1957). “Concluding Remarks.” Cold Spring Harbor Symposia on 
+                                    Quantitative Biology 22 (2): 415–27."),
                                   p("Kindsvater, L. (2006). Conservation and Restoration of the Endemic Island Oak, Quercus 
                                     tomentella in Channel Islands National Park using a Habitat Approach. University of 
                                     California - Davis, Davis, CA."),
@@ -158,17 +214,38 @@ ui<-fluidPage(theme = shinytheme("readable"),
                                     Quercus tomentella, on Santa Cruz and Santa Rosa, Islands, California. Oak Ecosystem 
                                     Restoration on Santa Catalina Island, California: Proceedings of an on-Island Workshop, 
                                     February 2-4, 2007, 16."),
+                                  p("Liu, Canran, Matt White, and Graeme Newell. 2013. “Selecting Thresholds for the Prediction
+                                    of Species Occurrence with Presence-Only Data.” Journal of Biogeography 40 (4): 778–89. 
+                                    https://doi.org/10.1111/jbi.12058."),
                                   p("McCune, J. (2005). Report on the census and survey of Island oak (Quercus 
                                     tomentella Engelm.) and canyon live oak (Quercus chrysolepis Liebm.) groves
                                     on Catalina Island, 2004 and 2005. Unpublished report prepared for the Catalina
                                     Island Conservancy, Avalon, CA."),
                                   p("Pavlik, B.M., P.C. Muick, et al. 1991. Oaks of California. Cachuma Press,
                                     Los Olivos, CA and the California Oak Foundation, Oakland, CA."),
-                                  p("Rastogi, B., Williams, A. P., Fischer, D. T., Iacobellis, S. F., McEachern, K., Carvalho,
-                                    L., ... & Still, C. J. (2016). Spatial and temporal patterns of cloud cover and fog 
-                                    inundation in coastal California: Ecological implications. Earth Interactions, 20(15), 1-19."),
+                                  p("Perkins, S.E., Alexander, L.V., and Nairn, J.R. (2012). Increasing frequency, 
+                                    intensity and duration of observed global heatwaves and warm spells. Geophysical 
+                                    Research Letters, 39(20)."),
+                                  p("Phillips, Steven J., Robert P. Anderson, Miroslav Dudík, Robert E. Schapire, and 
+                                    Mary E. Blair. 2017. “Opening the Black Box: An Open-Source Release of Maxent.” 
+                                    Ecography 40 (7): 887–93. https://doi.org/10.1111/ecog.03049."),
+                                  p("Phillips, Steven J., Robert P. Anderson, and Robert E. Schapire. 2006. “Maximum 
+                                    Entropy Modeling of Species Geographic Distributions.” Ecological Modelling 190 
+                                    (3–4): 231–59. https://doi.org/10.1016/j.ecolmodel.2005.03.026."),
+                                  p("Phillips, Steven J., Miroslav Dudík, and Robert E. Schapire. 2004. “A Maximum 
+                                    Entropy Approach to Species Distribution Modeling.” In Twenty-First International 
+                                    Conference on Machine Learning  - ICML ’04, 83. Banff, Alberta, Canada: ACM Press. 
+                                    https://doi.org/10.1145/1015330.1015412."),
+                                  p("Rastogi, B., Williams, A.P., Fischer, D.T., Iacobellis, S.F., McEachern, K., Carvalho, 
+                                    L., Jones, C., Baguskas, S., and Still, C.J. (2016). Spatial and temporal patterns of 
+                                    cloud cover and fog inundation in coastal California: Ecological implications. Earth 
+                                    Interactions, 20(15), 1-19."),
+                                  p("Williams, A.P., Schwartz, R.E., Iacobellis, S., Seager, R., Cook, B.I., Still, C.J., Husak, G., 
+                                    and Michaelsen, J. (2015). Urbanization causes increased cloud base height and decreased 
+                                    fog in coastal Southern California. Geophysical Research Letters, 42(5), 1527-1536."),
                                   br(),
                                   img(src = "landscape_soledad_oaks.jpg", width=900, height=600),
+                                  p("Photo: Denise Knapp"),
                                   br(),
                                   br()
                                   
@@ -190,11 +267,28 @@ ui<-fluidPage(theme = shinytheme("readable"),
                        )),
               tabPanel("Islands",
                        fluidRow(
+                         column(8, offset=2,
+                                p("The Islands tab allows users to select between viewing digital elevation models
+                                  or vegetation class layers for Santa Cruz and Santa Rosa Islands. The layers may
+                                  take a second to load as they are relatively detailed and fine resolution. More information 
+                                  on the layers can be found in the tab summary and data tab under Summary."))
+                       ),
+                       br(),
+                       fluidRow(
                          column(2,selectInput("islandvar", "Choose an Island Variable", c("DEM", "Vegetation"))),
-                         column(4,leafletOutput("islandmap", width=800, height=400))
-                       )
+                         column(4,leafletOutput("islandmap", width=1200, height=650))
+                       ),
+                       br(),
+                       br()
                        ),
               tabPanel("SDM",
+                       fluidRow(
+                         column(5, offset=2,
+                                p("The SDM tab provides our species distribution model (SDM) results for the island oak. 
+                         Before exploring the results shown in this tab, we highly recommend reading the tab summary
+                         page under project summary as well as the methodology tab."))
+                       ),
+                       br(),
                        fluidRow(
                          column(2,
                                 h4("Historic"),
@@ -360,7 +454,10 @@ server <- function(input, output, session) {
     colnames(histdf)<- c("Island", "Avg Test AUC", "Highest Suitability", "% Suitable")
     #Renaming so I can have spaces
     
-    kable(histdf, caption="**Table 1. Title Names.** Info and Data Source.",
+    kable(histdf, caption="Historic SDM Results for Santa Cruz and Santa Rosa Island. 
+             Results updated based on scenario selection, providing the  
+          Average Test AUC for the model run, the highest predicted
+          suitability value, and the percent of the island deemed suitable.",
           booktabs=TRUE, align=c(rep('c',times=4))) %>%
       kable_styling(bootstrap_options=c("condensed", font_size=12),full_width=F, position="left") %>%
       row_spec(0, color="black", background="lightblue", bold=TRUE) %>% 
@@ -491,7 +588,11 @@ server <- function(input, output, session) {
        colnames(projecttable)<- c("Island", "Avg Test AUC", "Highest Suitability", "% Suitable", "% Change")
        #Renaming so I can have spaces
        
-       kable(projecttable, caption="**Table 1. Title Names.** Info and Data Source.",
+       kable(projecttable, caption="Projected SDM Results for Santa Cruz and Santa Rosa Island. 
+             Results updated based on selected scenario combination, providing the  
+          Average Test AUC for the model run, the highest predicted
+             suitability value, the percent of the island deemed suitable, and percent change 
+          in suitability relative to the historic model.",
              booktabs=TRUE, align=c(rep('c',times=5))) %>%
          kable_styling(bootstrap_options=c("striped", "condensed",font_size=12), full_width=FALSE,position="left") %>%
          row_spec(0, color="black", background="lightblue", bold=TRUE) %>% 
